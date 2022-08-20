@@ -28,13 +28,23 @@ credits = """
  Developer: hide-wow on github | agent-hide on github | hide#1600 on discord
 """
 
-def connectServer(server: dict):
+def connectServer(server: dict, clientInfo: dict):
     context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
-    context.load_verify_locations("../ssl/CA/ca-key.pem")
+    context.load_verify_locations("../ssl/CA/ca-cert.pem")
 
     socket_obj = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_ssl = context.wrap_socket(socket_obj, server_hostname=host)
-    client_ssl.connect( ( server["ip"], server["port"] ) )
+    client = context.wrap_socket(socket_obj, server_hostname=server["ip"])
+    client.connect( ( server["ip"], server["port"] ) )
+
+    client.send(CLIENT_HI)
+
+    returnMsg = client.recv(1024)
+    if returnMsg == NICKNAME:
+        client.send(clientInfo["nickname"])
+    
+    returnMsg = client.recv(1024)
+    if returnMsg == NONUSER:
+        sys.exit("")
 
 def serverMenu():
     clear()
@@ -64,8 +74,16 @@ def serverMenu():
             choice()
 
     server = choice()
-    connectServer(server)
-    print(server)
+
+    nickname = input(" Nickname: ")
+    password = input(" Password: ")
+
+    client = {
+        "nickname": nickname,
+        "password": password
+    }
+
+    connectServer(server, client)
 
 def mainMenu():
     clear()

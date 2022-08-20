@@ -40,7 +40,7 @@ def returnTime():
 
 def getChanHistoric(chan: str):
     # Return the historic of a chan (the file get the name of the chan)
-    with open(f"chans/{chan}", "r") as chanFile:
+    withopen(f"chans/{chan}", "r") as chanFile:
         return chanFile.read()
 
 def updateChanHistoric(chan: str, msg: str):
